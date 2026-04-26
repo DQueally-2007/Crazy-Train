@@ -23,7 +23,7 @@ public class csvReader
         fileToRead.canRead();
         Scanner lineReader = new Scanner(fileToRead);   //Creates new scanner for use in reading lines
         lineReader.nextLine();                          //Skips first row of column names
-        while (reader.hasNextLine())                    //Reads all of the CSV's into ;ines array
+        while (lineReader.hasNextLine())                    //Reads all of the CSV's into ;ines array
         {
             lineRead = lineReader.nextLine();
             lines[textLinesIndex] = lineRead;
@@ -49,6 +49,21 @@ public class csvReader
             textLinesIndex++;                                    //As this method increments the textLinesIndex itself, it must always have the TLI reset after it is finished, within the function it is being used in
         }
         
+    }
+
+    public String[] returnLineArray()                           //Returns the array containing the individual data of the line being read, may want to convert this into an array of a class containing strings, may make the whole reading thing easier,but may be less memory efficient as they whole csv will be stored 3 times... 
+    {
+        return lineArray;
+    }
+
+    public void changeTLI(int input)                            //Changes the textLinesIndex as needed, not good for modularity, should fix soon to improve scalability and modularity
+    {
+        textLinesIndex = input;
+    }
+
+    public void resetTLI()                                      //Same as previous function, really needs to be removed, terrible for modularity
+    {
+        textLinesIndex = 0;
     }
 
     public boolean lineChecker()                                //Checks text line array to see if this line is a train line specifier
