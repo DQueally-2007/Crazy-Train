@@ -25,7 +25,7 @@ public class Line
     {
         addStation(fromStation);                                                                //Tries to add both stations to the list of stations to make sure connections can be added as necessary
         addStation(toStation);
-        for (x = 0; x < numberOfStations; x++)                                                  //Adds the same connection to both the to and from stations so the user can move in both directions
+        for (int x = 0; x < numberOfStations; x++)                                                  //Adds the same connection to both the to and from stations so the user can move in both directions
         {
             if(stations[x].nameOfStation() == fromStation)
             {
@@ -41,18 +41,17 @@ public class Line
 
     private int findNextFreeArrayValue()                                                        //Finds the next free position in the array, private as its not used outside of this class
     {
-        for (x=0; x<numberOfStations; x++)
+        int x = 0;
+        while (stations[x] != null)
         {
-            if (stations[x] == null)
-            {
-                return x;
-            }
+            x++;
         }
+        return x;
     }
 
     public boolean checkForStation(String stationNameToCheck)                                   //Checks if a station is in the list of stations, made much more efficient thanks to the number of stations being known already
     {
-        for (x = 0; x < numberOfStations; x++)
+        for (int x = 0; x < numberOfStations; x++)
         {
             if(stations[x].nameOfStation() == stationNameToCheck)
             {

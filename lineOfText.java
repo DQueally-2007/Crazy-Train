@@ -20,4 +20,19 @@ public class lineOfText
         }
         return false;                                           //Otherwise return false as it is a standard line
     }
+
+    public String getFirstWord()
+    {
+        return firstWord;
+    }
+
+    public String getSecondWord()
+    {
+        return secondWord;
+    }
+
+    public int getNumber()
+    {
+        return number;
+    }
 }
