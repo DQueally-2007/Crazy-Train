@@ -2,21 +2,19 @@ import java.io.*;
 import javax.swing.*;
 public class CrazyTrain 
 {
-    private String nameOfFile;
-    private csvReader reader;
-    private int numLines;
-    private Line lines[];
-    private lineOfText[] csvData;
+    private String nameOfFile;                              //Stores the name of the file to be acessed
+    private csvReader reader;                               //Stores the reader needed to read the csv file
+    private Line lines[];                                   //Stores the lines objects 
+    private lineOfText[] csvData;                           //Stores the csv data for use throughout the program
 
-    public CrazyTrain()                                     //Constructor makes the overall file reader, finds out the numbers of each element and creates the lines array
+    public CrazyTrain()                                     //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
     {
         nameOfFile = "Metrolink_times_linecolour(in).csv";
         reader = new csvReader(nameOfFile);
-        numLines = numberOfTrainLines();
         csvData = new lineOfText[reader.readCSVData().length];
         csvData = reader.readCSVData();
-        lines = new Line[numLines];
-        buildLines();                                       //Function that fills out the lines array
+        lines = new Line[numberOfTrainLines()];
+        buildLines();                                       //Function that fills out the lines array and the subarrays of each line to fill out the network
 
     }
 
@@ -24,7 +22,7 @@ public class CrazyTrain
     {
         String lineColour = null;
         int linesIndex = 0;
-        for (int x = 0; x < csvData.length; x++)                            //Reads through whole line array, again should make functions to minimise user involvement and count the number of lines for them to imporve modularity
+        for (int x = 0; x < csvData.length; x++)                //Goes through all the csv data      
         { 
             if (csvData[x].lineChecker() == true)               //If the linechecker tells us this is a new line then the line colour/name is set, the new line is created and the lines index increments 
             {
@@ -42,27 +40,27 @@ public class CrazyTrain
 
     private int countStationsInLine(int startingIndex)       //Counts the number of stations in a line to help improve efficeny by reducing the number of empty array positions, should apply to other areas lacking modularity
     {
-        int x = startingIndex + 1;                              //Stores the TLI position where the search starts and until a new line is detected the code increments the counter, returning the number of stations, the function is private as it is not used elsewhere
+        int x = startingIndex + 1;                           //Tells the search where to start
         int numStationsInLine = 0;
-        while(csvData[x].lineChecker() == false)
+        while(csvData[x].lineChecker() == false)             //Until a new line setting entry is found...
         {
             x++;
-            numStationsInLine++;
+            numStationsInLine++;                             //Incriment the number of stations each time
         } 
-        return numStationsInLine + 1;                       
+        return numStationsInLine + 1;                        //Return the number of stations in the line (The +1 is because there is always 1 more station in a line than connection entrys under it)
     }
 
-    private int numberOfTrainLines()
+    private int numberOfTrainLines()                         //Returns the number of train lines in the csv data and returns it
     {
         int numOfLines = 0;
-        for(int x = 0; x < csvData.length; x++)
+        for(int x = 0; x < csvData.length; x++)             //For every entry in the data
         {
-            if(csvData[x].lineChecker() == true)
+            if(csvData[x].lineChecker() == true)            //If its one that establishes a line
             {
-                numOfLines++;
+                numOfLines++;                               //Add to the count of the number of lines
             }
         }
-        return numOfLines;
+        return numOfLines;                                  //Return the number of lines
     }
     public static void main(String[] args)
     {
