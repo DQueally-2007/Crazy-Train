@@ -14,10 +14,9 @@ public class lineOfText
 
     public boolean lineChecker()                                //Checks text line array to see if this line is a train line specifier
     {
-        if (number == 0)                               //Second value is always null on a line specifying a line colour
+        if (number == 0.0)                               //Second value is always null on a line specifying a line colour
         {
             return true;                                        //So this certainly confirms the line of text being checked demarks a train line set
-            
         }
         return false;                                           //Otherwise return false as it is a standard line
     }

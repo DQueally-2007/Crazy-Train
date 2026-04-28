@@ -15,15 +15,10 @@ public class Line
 
     private void addStation(String stationName)                                                 //Adds a train station to the list of stations on the line, provided the station's name is not already on the stations list, private as it is just a subdivision of the connect stations functions that exists to make the code easier to break up in case of bugs
     {
-        if(checkForStation(stationName) == true)
-        {
-            System.out.println("Station Overlap");
-        }
-
         if(checkForStation(stationName) == false)
         {
             stations[findNextFreeArrayValue()] = new Station(stationName, lineName);            //Locates next free spot in the array and adds the new station to it
-            System.out.println("New Station");
+            
         }
 
     }
@@ -32,6 +27,7 @@ public class Line
     {
         addStation(fromStation);                                                                //Tries to add both stations to the list of stations to make sure connections can be added as necessary
         addStation(toStation);
+
         for (int x = 0; x < numberOfStations; x++)                                                  //Adds the same connection to both the to and from stations so the user can move in both directions
         {
             if(stations[x] != null)
@@ -39,12 +35,15 @@ public class Line
                 if(stations[x].nameOfStation() == fromStation)
                 {
                     stations[x].connectTo(toStation, timeToStation);
+                    
                 }
             
                 if(stations[x].nameOfStation() == toStation)
                 {
                     stations[x].connectTo(fromStation, timeToStation);
+                    
                 }
+
             }
         }
     }
@@ -65,10 +64,8 @@ public class Line
         {
             if(stations[x] != null)
             {
-                System.out.println("entered inner check");
-                if((stations[x].nameOfStation()) == stationNameToCheck)
+                if(stationNameToCheck.equals(stations[x].nameOfStation()))
                 {
-                    System.out.println("check is true");
                     return true;                                                                    //True if the station is in the list
                 }
             }

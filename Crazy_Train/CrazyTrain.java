@@ -35,10 +35,14 @@ public class CrazyTrain
                 System.out.println(lineColour);
                 lines[linesIndex] = new Line(lineColour, linesIndex, countStationsInLine(x));
                 linesIndex++;
+                
             }
+
 
             if (csvData[x].lineChecker() == false)              //If the line checker tells us the current line is not creating a new line then it adds the new stations and connection to the relevant arrays
             {
+
+
                 lines[linesIndex - 1].connectStations(csvData[x].getFirstWord(), csvData[x].getSecondWord(), csvData[x].getNumber());
             }
         }
@@ -52,6 +56,11 @@ public class CrazyTrain
         {
             x++;
             numStationsInLine++;                             //Incriment the number of stations each time
+
+            if (x >= csvData.length)
+            {
+                return numStationsInLine + 1;
+            }
         } 
         return numStationsInLine + 1;                        //Return the number of stations in the line (The +1 is because there is always 1 more station in a line than connection entrys under it)
     }
