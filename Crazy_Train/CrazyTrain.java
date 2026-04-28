@@ -12,11 +12,11 @@ public class CrazyTrain
 
     public CrazyTrain() throws FileNotFoundException        //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
     {
-        nameOfFile = "Metrolink_times_linecolour(in).csv";
-        reader = new csvReader(nameOfFile);
-        csvData = new lineOfText[(reader.readCSVData()).length];
+        nameOfFile = "Metrolink_times_linecolour(in).csv";  //Should be input late in the interface or some other way
+        reader = new csvReader(nameOfFile);                 //Creates new reader for the file
+        csvData = new lineOfText[(reader.readCSVData()).length];    //Creates new array of linesOfText to returned array from the csvReader
         csvData = reader.readCSVData();
-        lines = new Line[numberOfTrainLines()];
+        lines = new Line[numberOfTrainLines()];             //Stores the lines of the train network
         buildLines();                                       //Function that fills out the lines array and the subarrays of each line to fill out the network
         System.err.println("Good Job");
     }
@@ -24,17 +24,15 @@ public class CrazyTrain
     private void buildLines()                               //Fills out the lines arrays with the stations and adds the connections between the stations to the stations, fills out every level of the graph structure
     {
         
-        String lineColour = null;
-        int linesIndex = 0;
+        String lineColour = null;                               //Set to null at first to protect against exceptions
+        int linesIndex = 0;                                     //index to keep track of what line we have just added
         for (int x = 0; x < csvData.length; x++)                //Goes through all the csv data      
         { 
             if (csvData[x].lineChecker() == true)               //If the linechecker tells us this is a new line then the line colour/name is set, the new line is created and the lines index increments 
             {
-                System.out.println("True");
-                lineColour = csvData[x].firstWord;
-                System.out.println(lineColour);
-                lines[linesIndex] = new Line(lineColour, linesIndex, countStationsInLine(x));
-                linesIndex++;
+                lineColour = csvData[x].firstWord;                                              //Sets line colour for use in creating the new line
+                lines[linesIndex] = new Line(lineColour, linesIndex, countStationsInLine(x));   //Creates new line in array
+                linesIndex++;                                                                   //incriments the lines index
                 
             }
 
@@ -57,7 +55,7 @@ public class CrazyTrain
             x++;
             numStationsInLine++;                             //Incriment the number of stations each time
 
-            if (x >= csvData.length)
+            if (x >= csvData.length)                         //For when the end of the array is reached, returns number of stations that must be there
             {
                 return numStationsInLine + 1;
             }
@@ -78,7 +76,7 @@ public class CrazyTrain
         }
         return numOfLines;                                  //Return the number of lines
     }
-    public static void main(String[] args) throws FileNotFoundException
+    public static void main(String[] args) throws FileNotFoundException         //Main method
     {
         CrazyTrain c = new CrazyTrain();
     }

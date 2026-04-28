@@ -1,6 +1,6 @@
 
 
-public class Connection
+public class Connection                                                  //A connection between two stations on a certain line
 {
     private String lineColour;
     private String fromStation;

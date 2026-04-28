@@ -1,4 +1,4 @@
-public class Line 
+public class Line                                           //A class contatainging a number of stations
 {
     private String lineName;
     private int lineNumber;
@@ -30,18 +30,16 @@ public class Line
 
         for (int x = 0; x < numberOfStations; x++)                                                  //Adds the same connection to both the to and from stations so the user can move in both directions
         {
-            if(stations[x] != null)
+            if(stations[x] != null)                                                                 //If index x in stations is not null
             {
-                if(stations[x].nameOfStation() == fromStation)
+                if(stations[x].nameOfStation().equals(fromStation) == true)                         //If the from station has the same name as an existing station
                 {
-                    stations[x].connectTo(toStation, timeToStation);
-                    
+                    stations[x].connectTo(toStation, timeToStation);                                //Connect that station to the fromstation
                 }
             
-                if(stations[x].nameOfStation() == toStation)
+                if(stations[x].nameOfStation().equals(toStation) == true)                           //If the to station has the same name as an existing station
                 {
-                    stations[x].connectTo(fromStation, timeToStation);
-                    
+                    stations[x].connectTo(fromStation, timeToStation);                              //Connect that station to the fromstation
                 }
 
             }
@@ -51,26 +49,26 @@ public class Line
     private int findNextFreeArrayValue()                                                        //Finds the next free position in the array, private as its not used outside of this class
     {
         int x = 0;
-        while (stations[x] != null)
+        while (stations[x] != null)                                                             //While what is stored at the index x on the stations array does not equal null
         {
-            x++;
+            x++;                                                                                //Move along the array
         }
         return x;
     }
 
     public boolean checkForStation(String stationNameToCheck)                                   //Checks if a station is in the list of stations, made much more efficient thanks to the number of stations being known already
     {
-        for (int x = 0; x < numberOfStations; x++)
+        for (int x = 0; x < numberOfStations; x++)                                              //For every position in the array
         {
-            if(stations[x] != null)
+            if(stations[x] != null)                                                             //If it is not null
             {
-                if(stationNameToCheck.equals(stations[x].nameOfStation()))
+                if(stationNameToCheck.equals(stations[x].nameOfStation()))                      //If the name of that station is the one we are checking for
                 {
-                    return true;                                                                    //True if the station is in the list
+                    return true;                                                                    //Return true, the station is already in the array
                 }
             }
         }
-        return false;                                                                           //False if not
+        return false;                                                                           //Return false, the station is not in the array
     }
 
 }
