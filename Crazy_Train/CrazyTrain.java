@@ -30,7 +30,7 @@ public class CrazyTrain
         { 
             if (csvData[x].lineChecker() == true)               //If the linechecker tells us this is a new line then the line colour/name is set, the new line is created and the lines index increments 
             {
-                lineColour = csvData[x].firstWord;                                              //Sets line colour for use in creating the new line
+                lineColour = csvData[x].getFirstWord();                                              //Sets line colour for use in creating the new line
                 lines[linesIndex] = new Line(lineColour, linesIndex, countStationsInLine(x));   //Creates new line in array
                 linesIndex++;                                                                   //incriments the lines index
                 
