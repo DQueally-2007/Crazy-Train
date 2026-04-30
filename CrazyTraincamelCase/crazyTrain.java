@@ -1,0 +1,106 @@
+import java.io.*;
+import javax.sound.sampled.Line;
+import javax.swing.*;
+import java.io.File;                  
+import java.io.FileNotFoundException;
+
+public class crazyTrain 
+{
+    private String nameOfFile;                              //Stores the name of the file to be acessed
+    private csvReader reader;                               //Stores the reader needed to read the csv file
+    private line lines[];                                   //Stores the lines objects 
+    private lineOfText[] csvData;                           //Stores the csv data for use throughout the program
+
+    public crazyTrain() throws FileNotFoundException        //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
+    {
+        nameOfFile = "Metrolink_times_linecolour(in).csv";  //Should be input late in the interface or some other way
+        reader = new csvReader(nameOfFile);                 //Creates new reader for the file
+        csvData = new lineOfText[(reader.readCSVData()).length];    //Creates new array of linesOfText to returned array from the csvReader
+        csvData = reader.readCSVData();
+        lines = new line[numberOfTrainLines()];             //Stores the lines of the train network
+        buildLines();                                       //Function that fills out the lines array and the subarrays of each line to fill out the network
+        System.out.println("Lines Build");
+        combineConnections();
+        System.out.println("Connections crossed");
+    }
+
+    private void buildLines()                               //Fills out the lines arrays with the stations and adds the connections between the stations to the stations, fills out every level of the graph structure
+    {
+        
+        String lineColour = null;                               //Set to null at first to protect against exceptions
+        int linesIndex = 0;                                     //index to keep track of what line we have just added
+        for (int x = 0; x < csvData.length; x++)                //Goes through all the csv data      
+        { 
+            if (csvData[x].lineChecker() == true)               //If the linechecker tells us this is a new line then the line colour/name is set, the new line is created and the lines index increments 
+            {
+                lineColour = csvData[x].getFirstWord();                                              //Sets line colour for use in creating the new line
+                lines[linesIndex] = new line(lineColour, linesIndex, countStationsInLine(x));   //Creates new line in array
+                linesIndex++;                                                                   //incriments the lines index   
+            }
+
+            if (csvData[x].lineChecker() == false)              //If the line checker tells us the current line is not creating a new line then it adds the new stations and connection to the relevant arrays
+            {
+                lines[linesIndex - 1].connectStations(csvData[x].getFirstWord(), csvData[x].getSecondWord(), csvData[x].getNumber());
+            }
+        }
+    }
+
+    private int countStationsInLine(int startingIndex)       //Counts the number of stations in a line to help improve efficeny by reducing the number of empty array positions, should apply to other areas lacking modularity
+    {
+        int x = startingIndex + 1;                           //Tells the search where to start
+        int numStationsInLine = 0;
+        while(csvData[x].lineChecker() == false)             //Until a new line setting entry is found...
+        {
+            x++;
+            numStationsInLine++;                             //Incriment the number of stations each time
+
+            if (x >= csvData.length)                         //For when the end of the array is reached, returns number of stations that must be there
+            {
+                return numStationsInLine + 1;
+            }
+        } 
+        return numStationsInLine + 1;                        //Return the number of stations in the line (The +1 is because there is always 1 more station in a line than connection entrys under it)
+    }
+
+    private int numberOfTrainLines()                         //Returns the number of train lines in the csv data and returns it
+    {
+        int numOfLines = 0;
+        for(int x = 0; x < csvData.length; x++)             //For every entry in the data
+        {
+            
+            if(csvData[x].lineChecker() == true)            //If its one that establishes a line
+            {
+                numOfLines++;                               //Add to the count of the number of lines
+            }
+        }
+        return numOfLines;                                  //Return the number of lines
+    }
+
+    private void combineConnections()
+    {
+        for (int x = 0; x < lines.length; x++)
+        {
+            station[] checks = lines[x].getStationArray();
+            for (int y = 0; y < lines.length; y++)
+            {
+                if(lines[x] != lines[y])
+                {
+                    for (int z = 0; z < lines[x].getStationCount(); z++)
+                    {
+                        String stationNameToCheck = checks[z].nameOfStation();
+                        if(lines[y].checkForStation(stationNameToCheck) == true);
+                        {
+                            connection[] toAddOn = lines[y].returnStationConnections(stationNameToCheck);
+                            lines[x].addCrossConnections(stationNameToCheck, toAddOn);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) throws FileNotFoundException         //Main method
+    {
+        crazyTrain c = new crazyTrain();
+    }
+}
