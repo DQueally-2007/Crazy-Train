@@ -1,38 +1,37 @@
-public class station                           //Class to represent a station, an object which contains multiple connections to other stations
+import java.sql.Connection;
+
+public class station                               //Class to represent a station, an object which contains multiple connections to other stations
 {
-    private String stationName;
-    private String lineColour;
-    private int numberOfConnections;
-    private boolean canChangeLine;
-    private connection connections[];           //Could have value pre-set by doubling number of lines, no station can have more than the number of lines *2 connections
+    private String stationName;                    //String to store the name of the station
+    private String lineColour;                     //String to store the colour of the line this station is on
+    private connection connections[];              //Array to store the connections of this station
 
-    public station(String name, String colour) //Method to make a new station with its name, line name and an empty array for connections to be added to
+    public station(String name, String colour, int numberOfTrainLines)  //Method to make a new station with its name, line name and an empty array for connections to be added to
     {
-        stationName = name;
-        lineColour = colour;
-        connections = new connection[12];      //10 was aritarily chosen as the array's size since I have yet to see an underground map with more than that many connections from a single station
-    }                                           //There are 7 lines in the current file, useful for testing
-                                                //Works perfectly!!! most connected station is cornbrook at 12 connections and the program throws an error at 11 but works at 12 maxium connection, so the connections are crossing perfectly
+        stationName = name;                                             //Sets the station's name to the one provided
+        lineColour = colour;                                            //Sets the line colour to the one provided
+        connections = new connection[numberOfTrainLines*2];             //The array's maximum needed length can be determined by multiplying the total number of stations by 2, as a single station can only be connected to a maximum of 2 stations adjacent to it per line
+    }                                                                   //Works perfectly!!! most connected station is cornbrook at 12 connections and the program throws an error at 11 but works at 12 maxium connection, so the connections are crossing perfectly
 
-    public String nameOfStation()              //Simply returns the name of the station
+    public String nameOfStation()                                       //Simply returns the name of the station
     {
         return stationName;                     
     }
 
-    public void connectTo(String stationToConnectTo, float travelTime)    //Adds a conection to a station's list of connections
+    public void connectTo(String stationToConnectTo, float travelTime)                                          //Adds a conection to a station's list of connections
     {
-        if(connectedTo(stationToConnectTo) == false)                    //Checks that there is not already a connection to that station, nothing happens if its already connected
+        if(connectedTo(stationToConnectTo) == false)                                                            //Checks that there is not already a connection to that station, nothing happens if its already connected, prevents infinite loop
         {
             boolean added = false;
             int x = 0;
-            while (added == false)                                      //Adds the connection to the list in the next null position, assumes a full list won't happen, may need to change in future but perfectly servicable
+            while (added == false)                                                                              //While nothing has been added
             {
-                if (connections[x] == null)                             //if there is no connection in that position
+                if (connections[x] == null)                                                                     //if there is no connection in that position
                 {
                     connections[x] = new connection(lineColour, stationName, stationToConnectTo, travelTime);   //add new connection
-                    added = true;                                       //ends while loop
+                    added = true;                                                                               //ends while loop
                 }
-                x++;                                                    //incriment x to move along array
+                x++;                                                                                            //incriment x to move along array
             }
         }
     }
@@ -41,37 +40,25 @@ public class station                           //Class to represent a station, a
     {
         if(connectedTo(stationToGoTo) == true)                          //Checks station is connected
         {
-            for (int x = 0; x < 12; x++)                                //For length of connections array, may need to make bigger? May add function to calculate exact number of connections later
+            for (int x = 0; x < connections.length; x++)                //For every entry in the connections array
             {
-                if(connections[x].goingTo() == stationToGoTo )          //Searches through connections to find the correct one and returns the time it takes
+                if(connections[x].goingTo() == stationToGoTo )          //If the connection at x allows us to go to the stationToGoTo
                 {
-                    return connections[x].howLong();
+                    return connections[x].howLong();                    //Return the time it takes to get to the station given from this one
                 }
             }
-            
         }
         return 0;                                                       //Returns 0 if the station cannot be reached
     }
 
-    public void printConnections()
-    {
-        int x = 0;
-        while(connections[x] != null)
-        {
-            System.out.println(connections[x].getLineColour());
-            System.out.println(connections[x].goingFrom());
-            System.out.println(connections[x].goingTo());
-        }
-    }
-
-    public connection[] returnConnections()
+    public connection[] returnConnections()                             //Returns all of a station's connections in the form of the connections array
     {
         return connections;
     }
 
     private boolean connectedTo(String stationName)                     //Checks if a station is connected to annother, private as it is not needed elsewhere and it only exists to subdivide internal processes into easier to understand chunks
     {
-        for (int x = 0; x < 12; x++)                                    //For every position in the connections array
+        for (int x = 0; x < connections.length; x++)                    //For every position in the connections array
         {
             if(connections[x] != null)                                  //If it is not a null
             {
@@ -81,21 +68,21 @@ public class station                           //Class to represent a station, a
                 }
             }
         }
-        return false;                                                   //We cannot get to it
+        return false;                                                   //We cannot get to it if the loop has ended with no true being returned
     }
 
-    public void ammendConnections(connection toBeAdded)
+    public void ammendConnections(connection toBeAdded)                 //Function to ammend the connections array with new connections
     {
         boolean added = false;
         int x = 0;
-        while (added == false)                                      //Adds the connection to the list in the next null position, assumes a full list won't happen, may need to change in future but perfectly servicable
+        while (added == false)                                          //While the new connection has not been added
         {
-            if (connections[x] == null)                             //if there is no connection in that position
+            if (connections[x] == null)                                 //if there is no connection in position x
             {
-                connections[x] = toBeAdded;   //add new connection
-                added = true;                                       //ends while loop
+                connections[x] = toBeAdded;                             //add new connection to the blank position in the connections array
+                added = true;                                           //end while loop 
             }
-            x++;                                                    //incriment x to move along array
+            x++;                                                        //incriment x to move along array
         }   
     }
 

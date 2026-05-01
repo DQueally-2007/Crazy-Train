@@ -1,34 +1,34 @@
-public class connection                                                  //A connection between two stations on a certain line
+public class connection                                                     //A connection between two stations on a certain line
 {
-    private String lineColour;
-    private String fromStation;
-    private String toStation;
-    private float travelTime;
+    private String lineColour;                                              //String to store the colour of the line the connection is on
+    private String fromStation;                                             //String to store the name of the station this connection goes from
+    private String toStation;                                               //String to store the name of the station this conneciton goes to
+    private float travelTime;                                               //float to store the time in minutes the connection takes to traverse
 
-    public connection(String colour, String from, String to, float time)          //Constructor makes a new connection, some parameters may be unecessary, may remove to reduce complexity
+    public connection(String colour, String from, String to, float time)    //Constructor makes a new connection, some parameters may be unecessary, may remove to reduce complexity
     {
-        lineColour = colour;
-        fromStation = from;
-        toStation = to;
-        travelTime = time;
+        lineColour = colour;                                                //Sets the line colour to the string provided
+        fromStation = from;                                                 //Sets the from station to the string provided
+        toStation = to;                                                     //Sets the to station to the string provided
+        travelTime = time;                                                  //Sets the travel time to the one provided
     }
 
-    public String goingFrom()
+    public String goingFrom()                                               //Returns the fromStation
     {
         return fromStation;
     }
 
-    public String goingTo()                                                     //Returns the station a connection takes you to
+    public String goingTo()                                                 //Returns the toStation
     {
         return toStation;
     }
     
-    public float howLong()                                                        //Returns the time it takes to traverse a connection
+    public float howLong()                                                  //Returns the travelTime
     {
         return travelTime;
     }
 
-    public String getLineColour()
+    public String getLineColour()                                           //Returns the lineColour
     {
         return lineColour;
     }

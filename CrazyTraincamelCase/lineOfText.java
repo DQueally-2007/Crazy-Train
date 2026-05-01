@@ -1,14 +1,14 @@
 public class lineOfText                                         //Class to contain the data of the first type of csv file this project uses with two strings and a float
 {
-    private String firstWord;
-    private String secondWord;
-    private float number;
+    private String firstWord;                                   //String to store the first word of the line
+    private String secondWord;                                  //String to store the second word of the line
+    private float number;                                       //Float to store the 3rd value on the line, a number
     
     public lineOfText(String first, String second, float num)   //Constructor simply assigns the values to the variables
     {
-        firstWord = first;
-        secondWord = second;
-        number = num;
+        firstWord = first;                                      //Sets the first word to be the string provided
+        secondWord = second;                                    //Sets the second word to be the string provided
+        number = num;                                           //Sets the number to the int provided
 
     }
 
