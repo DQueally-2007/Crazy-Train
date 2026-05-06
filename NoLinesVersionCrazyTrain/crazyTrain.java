@@ -16,7 +16,7 @@ public class crazyTrain
 
     public crazyTrain() throws FileNotFoundException                    //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
     {       
-        nameOfFile = "Metrolink_times_linecolour(in).csv";              //Should be input late in the interface or some other way
+        nameOfFile = "Metro.csv";              //Should be input late in the interface or some other way
         reader = new csvReader(nameOfFile);                             //Creates new reader for the file
         csvData = new lineOfText[(reader.readCSVData()).length];        //Creates new array of linesOfText to returned array from the csvReader
         csvData = reader.readCSVData();                                 //Reads the csv data into the csvData array
@@ -35,6 +35,15 @@ public class crazyTrain
         {
             System.out.println(route[x]);
         }
+
+        walkingRouteFinder = new navigator(stations, "Abraham Moss", "Baguley", "walktimes.csv");
+
+        String[] walkRoute = walkingRouteFinder.shortestRouteToDestination();
+        for(int x = 0; x < walkRoute.length; x++)
+        {
+            System.out.println(walkRoute[x]);
+        }
+
 
     }
 

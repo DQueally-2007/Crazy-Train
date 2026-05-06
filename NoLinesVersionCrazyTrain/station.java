@@ -5,7 +5,7 @@ public class station                               //Class to represent a statio
     private String stationName;                    //String to store the name of the station
     private String lineColour;
     private int stationNumber;
-    private connection[] connections;
+    private Connection[] connections;
 
     public station(int num, String name, String lC, int nS)  //Method to make a new station with its name, line name and an empty array for connections to be added to
     {
@@ -64,24 +64,17 @@ public class station                               //Class to represent a statio
     {
         return lineColour;
     }
-    /* 
-    public void terminateStationconnections()
-    {
-        connection1 = null;
-        connection2 = null;
-    }
 
     public void cutOff(int stationToCutOff)
     {
-        if (connection1.goingTo() == stationToCutOff)
+        for(int x = 0; x < connections.length; x++)
         {
-            connection1 = null;
-        }
-        if (connection2.goingTo() == stationToCutOff)
-        {
-            connection2 = null;
+            if(connections[x].goingTo().equals(stationToCutOff))
+            {
+                connections[x] = null;
+            }
         }
     }
-    */
+    
 
 }
