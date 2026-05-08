@@ -33,8 +33,8 @@ public class connection                                                     //A 
         return lineColour;
     }
 
-    public void lineChange()
+    public void delay(float amountOfTime)
     {
-        travelTime = travelTime + 2;
+        travelTime = travelTime + amountOfTime;
     }
 }

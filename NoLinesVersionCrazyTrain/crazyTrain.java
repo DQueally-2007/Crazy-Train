@@ -1,50 +1,146 @@
 import java.io.*;
 import javax.sound.sampled.Line;
-import javax.swing.*;
 import java.io.File;                  
 import java.io.FileNotFoundException;
 
 public class crazyTrain 
 {
-    private String nameOfFile;                              //String to store the name of the file to be acessed
+    private String stationsFile;                              //String to store the name of the file to be acessed
     private csvReader reader;                               //csvReader to store the reader needed to read the csv file
     private lineOfText[] csvData;                           //Array of lines of text to store the csv data for use throughout the program
     private navigator routeFinder;
     private station[] stations;
     private String stationNames;
-    int numberOfTrainLines;
+    private String startingPoint;
+    private String destination;
+    private int numberOfTrainLines;
+    private String walkingFile;
+    private boolean allowWalk;
+    private boolean preferTime;
+    private boolean preferSwaps;
 
-    public crazyTrain() throws FileNotFoundException                    //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
-    {       
-        nameOfFile = "Metro.csv";              //Should be input late in the interface or some other way
-        reader = new csvReader(nameOfFile);                             //Creates new reader for the file
+    public crazyTrain(String nameOfStationsFile, String nameOfWalkingTimesFile) throws FileNotFoundException                    //Constructor makes the overall file reader, gets the arrays ready and calls the buildlines function to get everything going
+    {   
+        preferTime = true;
+        preferSwaps = false;
+        stationsFile = nameOfStationsFile;                              //Should be input late in the interface or some other way
+        walkingFile = nameOfWalkingTimesFile;
+        reader = new csvReader(stationsFile);                             //Creates new reader for the file
         csvData = new lineOfText[(reader.readCSVData()).length];        //Creates new array of linesOfText to returned array from the csvReader
         csvData = reader.readCSVData();                                 //Reads the csv data into the csvData array
         stations = new station[numberOfStations()];
         numberOfTrainLines = numberOfLines();
+        allowWalk = false;
         buildGraph();
-        System.out.println("Graph Built");                              //Informs us that the lines have been succesfully built
 
-        for(int y = 0; y < stations.length; y++)
+
+    }
+
+
+    public void setSP(String sp)
+    {
+        startingPoint = sp;
+        System.out.println(startingPoint);
+    }
+
+    public void setDest(String dest)
+    {
+        destination = dest;
+        System.out.println(destination);
+    }
+
+    public void setPreferTime(boolean tOf)
+    {
+        preferTime = tOf;
+    }
+
+    public void setPreferSwaps(boolean tOf)
+    {
+        preferSwaps = tOf;
+    }
+
+    public void setAllowWalk(boolean tOf)
+    {
+        allowWalk = tOf;
+    }
+
+
+    public String[] getRoute() throws FileNotFoundException
+    {
+        String[] route;
+        System.out.println(startingPoint);
+        System.out.println(destination);
+
+        if(walkingFile == null)
         {
-            //System.out.println(stations[y].nameOfStation());
+            routeFinder = new navigator(stations, startingPoint, destination, preferTime, preferSwaps);
+            route = routeFinder.shortestRouteToDestination();
         }
-        routeFinder = new navigator(stations,"Abraham Moss" , "Baguley");
-        String[] route = routeFinder.shortestRouteToDestination();
-        for(int x = 0; x < route.length; x++)
+
+        else
         {
-            System.out.println(route[x]);
+            routeFinder = new navigator(stations, startingPoint, destination, preferTime, preferSwaps, walkingFile);
+            route = routeFinder.shortestRouteToDestination();
         }
 
-        walkingRouteFinder = new navigator(stations, "Abraham Moss", "Baguley", "walktimes.csv");
+        return route;
+    }
 
-        String[] walkRoute = walkingRouteFinder.shortestRouteToDestination();
-        for(int x = 0; x < walkRoute.length; x++)
+    public String[] returnLineNames()
+    {
+        String[] lN = new String[numberOfTrainLines];
+        for(int x = 0; x < stations.length; x++)
         {
-            System.out.println(walkRoute[x]);
+            if(stations[x] != null)
+            {
+                boolean newColour = true;
+
+                for (int y = 0; y < lN.length; y++)
+                {
+                    if(lN[y] != null)
+                    {
+
+                        if(lN[y].equals(stations[x].getLineColour()))
+                        {
+                            newColour = false;
+                        }
+                        
+                    }
+                }
+                
+                if(newColour = true)
+                {
+                    int z = 0;
+                    while(lN[z] != null);
+                    {
+                        z++;
+                    }
+                    
+                    lN[z] = stations[x].getLineColour();
+                }
+            }
         }
 
+        return lN;
+    }
 
+    public String[] returnStationNamesInOrder()
+    {
+        String[] toReturn = null; //= routeFinder.getStationNamesInOrder();
+        return toReturn;
+    }
+
+    public int[] returnTimesInOrder()
+    {
+        int[] toReturn = null; //= routeFinder.getStationDistancesInOrder();
+        return toReturn;
+
+    }
+
+    public String[] returnColoursInOrder()
+    {
+        String[] toReturn = null; //= routeFinder.getColoursInOrder();
+        return toReturn;
     }
 
     private void buildGraph()                                                                                                           //Fills out the lines arrays with the stations and adds the connections between the stations to the stations, fills out every level of the graph structure
@@ -57,31 +153,25 @@ public class crazyTrain
             if (csvData[x].lineChecker() == true)                                                                                       //If the linechecker tells us this is a new line then the line colour/name is set, the new line is created and the lines index increments 
             {
                 lineColour = csvData[x].getFirstWord();                                                                                 //Sets line colour for use in creating the new line  
-                System.out.println(lineColour);
             }
 
             else
             {
                 if (csvData[x].lineChecker() == false)                                                                                      //If the line checker tells us the current line is not creating a new line then it adds the new stations and connection to the relevant arrays
                 {
-                    //System.out.println(csvData[x].getFirstWord());
-                    //System.out.println(csvData[x].getSecondWord());
-                    
+
                     if(notAlreadyThere(csvData[x].getFirstWord(), lineColour))
                     {
-                        //System.out.println("Station " + csvData[x].getFirstWord() + " added");
                         addStation(stationsIndex, csvData[x].getFirstWord(), lineColour, numberOfTrainLines);
                         stationsIndex++;
                     }
 
                     if(notAlreadyThere(csvData[x].getSecondWord(), lineColour))
                     {
-                        //System.out.println("Station " + csvData[x].getSecondWord() + " added");
                         addStation(stationsIndex, csvData[x].getSecondWord(), lineColour, numberOfTrainLines);
                         stationsIndex++;
 
                     }
-                    //System.out.println(getStationNumber( lineColour, csvData[x].getFirstWord()));
                     connectStations(getStationNumber(lineColour, csvData[x].getFirstWord()), getStationNumber(lineColour, csvData[x].getSecondWord()), lineColour,csvData[x].getNumber());
                 }
             }
@@ -97,16 +187,11 @@ public class crazyTrain
             {
                 if(stations[y] != null)
                 {
-                    //System.out.println(stations[x].nameOfStation());
-                    //System.out.println(stations[x].getLineColour());
+
                     if(stations[y].getLineColour().equals(colour) == false)
                     {
                         if(stations[y].nameOfStation().equals(name))
                         {
-                            //System.out.println(stations[z].nameOfStation());
-                            //System.out.println(stations[z].getLineColour());
-                            //System.out.println(stations[y].nameOfStation());
-                            //System.out.println(stations[y].getLineColour());
                             numRepeats++;
                         }
                     }
@@ -114,15 +199,12 @@ public class crazyTrain
             }
 
             int[] repeatLocations = new int[numRepeats];
-            //System.out.println(numRepeats);
             int reps = 0;
 
             for(int v = 0; v < stations.length; v++)
             {
                 if(stations[v] != null)
                 {
-                    //System.out.println(stations[x].nameOfStation());
-                    //System.out.println(stations[x].getLineColour());
                     if(stations[v].getLineColour().equals(colour) == false)
                     {
                         if(stations[v].nameOfStation().equals(name))
@@ -149,8 +231,6 @@ public class crazyTrain
         {
             if(stations[x] != null)
             {
-                //System.out.println(stations[x].nameOfStation());
-                //System.out.println(stations[x].getLineColour());
                 if(stations[x].getLineColour().equals(col))
                 {
                     if(stations[x].nameOfStation().equals(name))
@@ -250,16 +330,73 @@ public class crazyTrain
         return numOfLines;                                      //Return the number of lines
     }
 
-    public static void main(String[] args)          //Main method
+
+    public boolean delayConnection(String delayed1, String delayed2, String lineCol, float delayTime)
     {
-        //try and catch statements to handle file not found exceptions
-        try                                     
-        {
-            crazyTrain c = new crazyTrain();
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("No file found");
-        }
+        boolean returnValue = routeFinder.stationDelayed(delayed1, delayed2, lineCol, delayTime);
+        return returnValue;
     }
+
+     
+    public boolean closeStation(String closure)
+    {
+        int[] needClosing = whereInArray(closure);
+        if(needClosing == null)
+        {
+            return false;
+        }
+
+        for(int x = 0; x < needClosing.length; x++)
+        {
+            for(int y = 0; y < stations.length; y++)
+            {
+                if(stations[y] != null)
+                {
+                    stations[y].cutOff(needClosing[x]);
+                }
+            }
+            stations[needClosing[x]] = null;
+        }
+        return true;
+    }
+
+
+    private int[] whereInArray(String stationName)                                         //returns the position a station holds in the stations array when given its name
+    {
+        int arraylength = 0;
+        for(int x = 0; x < stations.length; x++)                                                //For every station in the array
+        {
+            if(stations[x] != null)
+            {
+                if(stations[x].nameOfStation().equals(stationName) == true)                        //If the station being checked's name is the same as the one we are looking for
+                {
+                    arraylength ++;                                                                       //Return the current index
+                }
+            }
+        }
+        if(arraylength == 0)
+        {
+            return null;
+        }
+
+        int[] placesInArray = new int[arraylength];
+        int y = 0;
+        for(int z = 0; z < stations.length; z++)                                                //For every station in the array
+        {
+            if(stations[z] != null)
+            {
+                if(stations[z].nameOfStation().equals(stationName) == true)                        //If the station being checked's name is the same as the one we are looking for
+                {
+                    placesInArray[y] = z;
+                    y++;                                                                     //Return the current index
+                }
+            }
+        }
+        return placesInArray;
+                                                                                      //return -1 if it is not in the array
+    }
+
+
+
+
 }

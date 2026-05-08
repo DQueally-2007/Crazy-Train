@@ -2,7 +2,7 @@ public class lineOfText2                                         //Class to cont
 {
     private String[] data;
 
-    public lineOfText(String[] inputStrings)   //Constructor simply assigns the values to the variables
+    public lineOfText2(String[] inputStrings)   //Constructor simply assigns the values to the variables
     {
         data = inputStrings;
     }
@@ -18,43 +18,17 @@ public class lineOfText2                                         //Class to cont
         }
         return -1;
     }
-
-
-    public String nameOfShortestWalktimeStation(int arrayPosition)
+    
+    public String readValue(int position)
     {
-        return data[arrayPosition];
+        return data[position];
+    }
+
+    public int getDataLength()
+    {
+        return data.length;
     }
     
 
-    public float shortestWalktimeFromStation()
-    {
-        float smallestWalktime = 999999;
 
-        for(int x = 1; x < data.length; x++)
-        {
-            if(Integer.parseInt(data[x]) < smallestWalktime)
-            {
-                smallestWalktime = Integer.parseInt(data[x]); 
-            }
-        }
-        return smallestWalktime;
-
-    }
-
-    public int shortestWalktimeArrayPosition()
-    {
-
-        int smallestWalktimePosition = -1;
-        float smallestWalktime = 999999;
-
-        for(int x = 1; x < data.length; x++)
-        {
-            if(Integer.parseInt(data[x]) < smallestWalktime)
-            {
-                smallestWalktime = Integer.parseInt(data[x]);
-                smallestWalktimePosition = x; 
-            }
-        }
-        return smallestWalktime;
-
-    }
+}

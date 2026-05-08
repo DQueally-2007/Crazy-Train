@@ -1,24 +1,65 @@
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 
 import javax.sound.sampled.Line;
 
 public class navigator 
 {
-    String currentStation;
-    String startingStation;
-    String destination;
-    boolean [] visitedStations;
-    int [] previousStations;
-    float [] distanceFromSource;
-    String [] previousStationLineColour;
-    station [] network;
-    float distanceTotal;
-    lineOfText2 [] walkingTimesData;
+    private String currentStation;
+    private String startingStation;
+    private String destination;
+    private boolean [] visitedStations;
+    private int [] previousStations;
+    private float [] distanceFromSource;
+    private String [] previousStationLineColour;
+    private station [] network;
+    private float distanceTotal;
+    private csvReader2 walkingTimesReader;
+    private lineOfText2[] walkingTimesData;
+    private boolean preferTime;
+    private boolean preferSwap;
 
-    public navigator(station[] networkToTraverse, String startStation, String endStation)
+    public navigator(station[] networkToTraverse, String startStation, String endStation, boolean prefTime, boolean prefSwap)
     {
+        walkingTimesData = null;
         network = networkToTraverse;
-        startStation = startStation;
+        startingStation = startStation;
+        currentStation = startingStation;
+        destination = endStation;
+        distanceTotal = 0;
+        visitedStations = new boolean[network.length];
+        previousStations = new int[network.length];
+        distanceFromSource = new float[network.length];
+        previousStationLineColour = new String[network.length];
+        preferTime = prefTime;
+        preferSwap = prefSwap;
+
+        for(int z = 0; z < network.length; z++)
+        {
+            visitedStations[z] = false;
+            previousStations[z] = -999;
+            distanceFromSource[z] = 999;
+            previousStationLineColour[z] = null;
+        }
+
+        int [] sppSInArray = whereInArray(startStation);
+
+        for(int x = 0; x < sppSInArray.length; x++)
+        {
+            if(sppSInArray[x] != 0)
+            {
+                previousStations[sppSInArray[x]] = sppSInArray[x];
+                distanceFromSource[sppSInArray[x]] = 0;
+            }
+        }
+    }
+
+    public navigator(station[] networkToTraverse, String startStation, String endStation, boolean prefTime, boolean prefSwap, String walktimesFileName) throws FileNotFoundException
+    {
+        walkingTimesReader = new csvReader2(walktimesFileName);
+        walkingTimesData = walkingTimesReader.readCSVData2();
+        network = networkToTraverse;
+        startingStation = startStation;
         currentStation = startingStation;
         destination = endStation;
         distanceTotal = 0;
@@ -35,102 +76,78 @@ public class navigator
             previousStationLineColour[z] = null;
         }
 
-        int [] startingPointPositionsInArray = whereInArray(currentStation);
+        int[] startingPointPositionsInArray = whereInArray(currentStation);
 
         for(int x = 0; x < startingPointPositionsInArray.length; x++)
         {
             previousStations[startingPointPositionsInArray[x]] = startingPointPositionsInArray[x];
             distanceFromSource[startingPointPositionsInArray[x]] = 0;
         }
-    }
-
-    public navigator(station[] networkToTraverse, String startStation, String endStation, String walktimesFileName)
-    {
-        network = networkToTraverse;
-        currentStation = startStation;
-        destination = endStation;
-        distanceTotal = 0;
-        visitedStations = new boolean[network.length];
-        previousStations = new int[network.length];
-        distanceFromSource = new float[network.length];
-        previousStationLineColour = new String[network.length];
-
-        for(int z = 0; z < network.length; z++)
-        {
-            visitedStations[z] = false;
-            previousStations[z] = -999;
-            distanceFromSource[z] = 999;
-            previousStationLineColour[z] = null;
-        }
-
-        int [] startingPointPositionsInArray = whereInArray(currentStation);
-
-        for(int x = 0; x < startingPointPositionsInArray.length; x++)
-        {
-            previousStations[startingPointPositionsInArray[x]] = startingPointPositionsInArray[x];
-            distanceFromSource[startingPointPositionsInArray[x]] = 0;
-        }
-
-        csvReader2 walkReader = new csvReader2(walktimesFileName);
-        walkingTimesData = walkReader.readCSVData();
-        
     }
 
     //RECURSIVE!!!!!
     private void dijkstraAlgorithm()
     {   
-        int index;
-        while(allVisited() == false)
+
+        if(preferTime)
         {
-
-            index = indexOfLowestDistanceFromSource();   
-            currentStation = network[index].nameOfStation();
-            connection[] connectionsOfCurrentStation = network[index].getConnections();
-
-            
-            visitedStations[index] = true;
-
-
-            for(int x = 0; x < connectionsOfCurrentStation.length; x++)
+            int index;
+            while(allVisited() == false)
             {
-                if(connectionsOfCurrentStation[x] != null)
+
+                index = indexOfLowestDistanceFromSource();   
+                currentStation = network[index].nameOfStation();
+                connection[] connectionsOfCurrentStation = network[index].getConnections();
+
+                
+                visitedStations[index] = true;
+
+
+                for(int x = 0; x < connectionsOfCurrentStation.length; x++)
                 {
-                    float estimatedDistance = distanceFromSource[index] + connectionsOfCurrentStation[x].howLong();
-                    
-
-                    if(estimatedDistance < distanceFromSource[connectionsOfCurrentStation[x].goingTo()])
+                    if(connectionsOfCurrentStation[x] != null)
                     {
-                        distanceFromSource[connectionsOfCurrentStation[x].goingTo()] = estimatedDistance;
-                        previousStations[connectionsOfCurrentStation[x].goingTo()] = index;
-                        previousStationLineColour[connectionsOfCurrentStation[x].goingTo()] = network[index].getLineColour();
-                    }
-                }
-            }
+                        float estimatedDistance = distanceFromSource[index] + connectionsOfCurrentStation[x].howLong();
+                        
 
-            if(walkingTimesData != null)
-            {
-                int rowToCheck = walkingTimesData[0].whereInArray(currentStation);
-                for(int y = 1; y < walkingTimesData[rowToCheck].length; y++)
-                {   
-                    int[] stationLocations = whereInArray(walkingTimesData[0][y]);
-                    float shortestDistance = 9999;
-                    int shortesDistanceVersionOfStationIndex = -1;
-                    for(int z = 0; z < stationLocations.length; z++)
-                    {
-                        float estimatedDistance = distanceFromSource[index] + walkingTimesData[rowToCheck][y];
-
-                        if(estimatedDistance < distanceFromSource[z])
+                        if(estimatedDistance < distanceFromSource[connectionsOfCurrentStation[x].goingTo()])
                         {
-                            distanceFromSource[z] = estimatedDistance;
-                            previousStations[z] = index;
-                            previousStationLineColour[z] = "Walking";
+                            distanceFromSource[connectionsOfCurrentStation[x].goingTo()] = estimatedDistance;
+                            previousStations[connectionsOfCurrentStation[x].goingTo()] = index;
+                            previousStationLineColour[connectionsOfCurrentStation[x].goingTo()] = network[index].getLineColour();
                         }
                     }
                 }
-            }
 
-        }        
-        System.out.println("Dijkstra's finished");
+                if(walkingTimesData != null)
+                {
+                    int rowToCheck = walkingTimesData[0].stationNumberInArray(currentStation);
+                    for(int y = 1; y < walkingTimesData.length; y++)
+                    {   
+                        int[] stationLocations = whereInArray(walkingTimesData[0].readValue(y));
+                        float estimatedDistance = distanceFromSource[index] + Float.parseFloat(walkingTimesData[rowToCheck].readValue(y));
+                        for(int z = 0; z < stationLocations.length; z++)
+                        {
+                            if(estimatedDistance < distanceFromSource[stationLocations[z]])
+                            {
+                                distanceFromSource[stationLocations[z]] = estimatedDistance;
+                                previousStations[stationLocations[z]] = index;
+                                previousStationLineColour[stationLocations[z]] = "Walking";
+                            }
+                        }
+                    }
+                }
+            }        
+        }   
+
+        
+        else
+        {
+            if(preferSwap)
+            {
+                //Code for minimum swaps pathfinding
+            }
+        }
     }
 
 
@@ -187,7 +204,7 @@ public class navigator
         stationName = destination;
         indexWhere = definiteEnding;
         colour = previousStationLineColour[indexWhere];
-        
+
         for(int x = 0; x < numberOfSteps; x++)
         {
             
@@ -200,17 +217,17 @@ public class navigator
 
                 if(walkingTimesData != null)
                 {
-                    routeInReverse[x] = ("Walk to " + stationName+ ". Distance from source is " + distanceFromSource[indexWhere]);
+                    routeInReverse[x] = ("Walk to " + stationName+ ". Time from start is " + distanceFromSource[indexWhere]);
                 }    
             }
             
             else
             {
-                routeInReverse[x] = "Go to " + stationName + " on the " + colour + " line. Distance from source is " + distanceFromSource[indexWhere];
+                routeInReverse[x] = "Go to " + stationName + " on the " + colour + " line. Time from start is " + distanceFromSource[indexWhere];
 
                 if(colour.equals("Walking"))
                 {
-                    routeInReverse[x] = ("Continue walking to " + stationName + ". Distance from source is " + distanceFromSource[indexWhere]);
+                    routeInReverse[x] = ("Continue walking to " + stationName + ". Time from start is " + distanceFromSource[indexWhere]);
                 }
             }
             
@@ -224,9 +241,9 @@ public class navigator
                 }
             }
 
-            if(x == 1)
+            if(x == 0)
             {
-                routeInReverse[1] = ("Go to " + stationName + " station on the " + colour + " line, this will end your journey for a total travel time of " + distanceFromSource[indexWhere]);
+                routeInReverse[x] = ("Go to " + stationName + " station on the " + colour + " line, this will end your journey for a total travel time of " + distanceFromSource[indexWhere]);
                 
                 if(colour.equals("Walking"))
                 {
@@ -258,7 +275,6 @@ public class navigator
         
         float lowestDistance = 9999999;
         int lowestIndex = -1;
-        //System.out.println(lineCol);
         for (int x = 0; x < network.length; x++)
         {
             if(network[x] != null)
@@ -291,37 +307,73 @@ public class navigator
         return true;
     }
 
-    public void stationsDelayed(String[] delayedConnections, int[] delayTimes)
+    public boolean stationDelayed(String delayFirstStation, String delaySecondStation, String lc ,float time)
     {
-        for (int x = 0; x < delayedConnections.length; x++)
-        {
+        boolean delay1 = false;
+        boolean delay2 = false;
 
+        int[] potentialPlaces1 = whereInArray(delayFirstStation);
+        int definitePlace1 = 0;
+        int[] potentialPlaces2 = whereInArray(delaySecondStation);
+        int definitePlace2 = 0;
+
+        for(int y = 0; y < potentialPlaces1.length; y++)
+        {
+            if(network[potentialPlaces1[y]].getLineColour().equals(lc))
+            {
+                definitePlace1 = potentialPlaces1[y];
+            }
         }
+
+        for(int z = 0; z < potentialPlaces2.length; z++)
+        {
+            if(network[potentialPlaces2[z]].getLineColour().equals(lc))
+            {
+                definitePlace2 = potentialPlaces2[z];
+            }
+        }
+
+        if(network[definitePlace1].connectedTo(definitePlace2) && network[definitePlace2].connectedTo(definitePlace1))
+        {
+            delay1 = network[definitePlace1].delayConnection(definitePlace2, time);
+            delay2 = network[definitePlace2].delayConnection(definitePlace1, time);
+        }
+        
+        if(delay1 && delay2 == true)
+        {
+            return true;
+        }
+
+        return false;
     }
 
      
-    public void stationsClosed(String[] closures)
+    public boolean stationClosed(String closing)
     {
-        for(int x = 0; x < closures.length; x++)
+    
+        int[] needClosing = whereInArray(closing);
+        if(needClosing == null)
         {
-            int[] needClosing = whereInArray(closures[x]);
-            for(int z = 0; z < needClosing.length; z++)
-            {
-                for(int y = 0; y < network.length; y++)
-                {
-                    if(network[y] != null)
-                    {
-                        network[y].cutOff(needClosing[z]);
-                    }
-                }
-                network[needClosing[z]] = null;
-                visitedStations[needClosing[z]] = true;
-            }
+            return false;
         }
+
+        for(int x = 0; x < needClosing.length; x++)
+        {
+            for(int y = 0; y < network.length; y++)
+            {
+                if(network[y] != null)
+                {
+                    network[y].cutOff(needClosing[x]);
+                }
+            }
+            network[needClosing[x]] = null;
+            visitedStations[needClosing[x]] = true;
+        }
+        return true;
     }
     
 
-    private int[] whereInArray(String stationName)                                         //returns the position a station holds in the stations array when given its name
+    public int[] whereInArray(String stationName)                                         //returns the position a station holds in the stations array when given its name
     {
         int arraylength = 0;
         for(int x = 0; x < network.length; x++)                                                //For every station in the array
@@ -341,23 +393,37 @@ public class navigator
 
         int[] placesInArray = new int[arraylength];
         int y = 0;
-        for(int x = 0; x < network.length; x++)                                                //For every station in the array
+        for(int z = 0; z < network.length; z++)                                                //For every station in the array
         {
-            if(network[x] != null)
+            if(network[z] != null)
             {
-                if(network[x].nameOfStation().equals(stationName) == true)                        //If the station being checked's name is the same as the one we are looking for
+                if(network[z].nameOfStation().equals(stationName) == true)                        //If the station being checked's name is the same as the one we are looking for
                 {
-                    placesInArray[y] = x;
+                    placesInArray[y] = z;
                     y++;                                                                     //Return the current index
                 }
             }
         }
-
         return placesInArray;
-
                                                                                       //return -1 if it is not in the array
     }
 
+    /* 
+    public String[] getStationNamesInOrder()
+    {
+
+    }
+
+    public int[] getStationDistancesInOrder()
+    {
+
+    }
+
+    public String[] getColoursInOrder()
+    {
+
+    }
+    */
 
 
     //Walking, at every stage of the dijstras algorithm, make a new connections array as long as the number of stations in the whole network and recursively compute potential routes including walking times

@@ -5,7 +5,7 @@ public class station                               //Class to represent a statio
     private String stationName;                    //String to store the name of the station
     private String lineColour;
     private int stationNumber;
-    private Connection[] connections;
+    private connection[] connections;
 
     public station(int num, String name, String lC, int nS)  //Method to make a new station with its name, line name and an empty array for connections to be added to
     {
@@ -45,7 +45,7 @@ public class station                               //Class to represent a statio
     }
 
 
-    private boolean connectedTo(int stationNm)                     //Checks if a station is connected to annother, private as it is not needed elsewhere and it only exists to subdivide internal processes into easier to understand chunks
+    public boolean connectedTo(int stationNm)                     //Checks if a station is connected to annother, private as it is not needed elsewhere and it only exists to subdivide internal processes into easier to understand chunks
     {
         for(int x = 0; x < connections.length; x++)
         {
@@ -69,11 +69,27 @@ public class station                               //Class to represent a statio
     {
         for(int x = 0; x < connections.length; x++)
         {
-            if(connections[x].goingTo().equals(stationToCutOff))
+            if(connections[x] != null)
             {
-                connections[x] = null;
+                if(connections[x].goingTo() == stationToCutOff)
+                {
+                    connections[x] = null;
+                }
             }
         }
+    }
+
+    public boolean delayConnection(int stationToDelayTo, float delayAmount)
+    {
+        for(int x = 0; x < connections.length; x++)
+        {
+            if(connections[x].goingTo() == stationToDelayTo)
+            {
+                connections[x].delay(delayAmount);
+                return true;  
+            }
+        }
+        return false;
     }
     
 

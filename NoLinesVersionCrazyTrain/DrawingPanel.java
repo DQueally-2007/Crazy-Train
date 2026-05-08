@@ -1,16 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
 
-private Graphics graphics;
-private Font drawingFont;
+
 
 public class DrawingPanel extends JPanel 
 {
-    public DrawingPanel(Layout layout)
+    private Graphics graphics;
+    private Font drawingFont;
+    
+    public DrawingPanel(LayoutManager layout)
     {
         super(layout);
-        graphics = new Graphics();
-        drawingFont = new Font(ds, 1, 3);
+        drawingFont = new Font("df", 1, 3);
         graphics.setFont(drawingFont);
     }
 

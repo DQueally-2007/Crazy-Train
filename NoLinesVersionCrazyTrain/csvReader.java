@@ -9,7 +9,7 @@ public class csvReader                                                          
 
     public csvReader(String fileName) throws FileNotFoundException                                                    //Constructor for the csv reader, takes in filename as string currently
     {                   
-        fileToRead = new File("Metro.csv");                                                                           //Trying to fix compile errors with csv reader, replace with fileName variable later
+        fileToRead = new File(fileName);                                                                           //Trying to fix compile errors with csv reader, replace with fileName variable later
         fileToRead.canRead();                                                                                         //Lets the file be read
         linesOfText = new String[linesArraySize(fileToRead)];                                                         //Stores the lines of text in a large array of strings
         readCSVLines(fileToRead);                                                                                     // Reads the csv file into the array for use later in the data reader
