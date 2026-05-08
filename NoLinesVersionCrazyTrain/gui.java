@@ -544,7 +544,7 @@ public class gui implements ActionListener
 
             if(e.getSource() == confirmFP2)
             {
-                stationFilepath = filePath2.getText();
+                walkingTimesFilepath = filePath2.getText();
                 makeFileEntryInterface();
             }
 
@@ -739,6 +739,9 @@ public class gui implements ActionListener
 
             if(e.getSource() == runProgram)
             {
+                mainCode.setPreferTime(preferTime);
+                mainCode.setPreferSwaps(preferSwaps);
+                mainCode.setAllowWalk(walkingPreference);
                 mainCode.setSP(startingPointString);
                 mainCode.setDest(destinationString);
                 System.out.println("***");

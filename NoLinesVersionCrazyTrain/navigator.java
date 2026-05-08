@@ -16,6 +16,7 @@ public class navigator
     private float distanceTotal;
     private csvReader2 walkingTimesReader;
     private lineOfText2[] walkingTimesData;
+    private int[] numberOfSwapsPrior;
     private boolean preferTime;
     private boolean preferSwap;
 
@@ -31,6 +32,8 @@ public class navigator
         previousStations = new int[network.length];
         distanceFromSource = new float[network.length];
         previousStationLineColour = new String[network.length];
+        numberOfSwapsPrior = new int[network.length];
+
         preferTime = prefTime;
         preferSwap = prefSwap;
 
@@ -40,6 +43,7 @@ public class navigator
             previousStations[z] = -999;
             distanceFromSource[z] = 999;
             previousStationLineColour[z] = null;
+
         }
 
         int [] sppSInArray = whereInArray(startStation);
@@ -50,6 +54,7 @@ public class navigator
             {
                 previousStations[sppSInArray[x]] = sppSInArray[x];
                 distanceFromSource[sppSInArray[x]] = 0;
+                numberOfSwapsPrior[sppSInArray[x]] = 0;
             }
         }
     }
@@ -145,7 +150,43 @@ public class navigator
         {
             if(preferSwap)
             {
-                //Code for minimum swaps pathfinding
+                System.out.println("SWAP!");
+                int index;
+                while(allVisited() == false)
+                {
+
+                    index = indexOfFewestChangesFromSource();   
+                    currentStation = network[index].nameOfStation();
+                    connection[] connectionsOfCurrentStation = network[index].getConnections();
+
+                    
+                    visitedStations[index] = true;
+
+
+                    for(int x = 0; x < connectionsOfCurrentStation.length; x++)
+                    {
+                        if(connectionsOfCurrentStation[x] != null)
+                        {
+                            float estimatedDistance = distanceFromSource[index] + connectionsOfCurrentStation[x].howLong();
+                            
+
+                            if(estimatedDistance < distanceFromSource[connectionsOfCurrentStation[x].goingTo()])
+                            {
+                                distanceFromSource[connectionsOfCurrentStation[x].goingTo()] = estimatedDistance;
+                                previousStations[connectionsOfCurrentStation[x].goingTo()] = index;
+                                previousStationLineColour[connectionsOfCurrentStation[x].goingTo()] = network[index].getLineColour();
+                                if(previousStationLineColour[connectionsOfCurrentStation[x].goingTo()].equals(network[index].getLineColour()) == false)
+                                {
+                                    numberOfSwapsPrior[connectionsOfCurrentStation[x].goingTo()] = numberOfSwapsPrior[index] + 1;
+                                } 
+                            }
+                        }
+                        if(network[x] != null)
+                        {
+                            System.out.println(distanceFromSource[x]);         
+                        }
+                    }
+                }     
             }
         }
     }
@@ -284,6 +325,29 @@ public class navigator
                     if(distanceFromSource[x] < lowestDistance)
                     {
                         lowestDistance = distanceFromSource[x];
+                        lowestIndex = x;
+                    }
+                }
+            }    
+        }
+
+        return lowestIndex;
+    }
+
+    private int indexOfFewestChangesFromSource()
+    {
+        
+        float fewestChanges = 9999999;
+        int lowestIndex = -1;
+        for (int x = 0; x < network.length; x++)
+        {
+            if(network[x] != null)
+            {
+                if(visitedStations[x] == false)
+                {    
+                    if(numberOfSwapsPrior[x] < fewestChanges)
+                    {
+                        fewestChanges = numberOfSwapsPrior[x];
                         lowestIndex = x;
                     }
                 }
